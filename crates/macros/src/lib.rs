@@ -1,5 +1,5 @@
 use proc_macro::*;
-use scene::SGraph;
+use scene::SScene;
 use syn::{parse::Parse, parse_macro_input, Ident, LitStr, Token};
 
 #[proc_macro_attribute]
@@ -46,7 +46,7 @@ pub fn load_scene(tokens: TokenStream) -> TokenStream {
     let LoadScene { scene_loader, path } = parse_macro_input!(tokens as LoadScene);
 
     let source = std::fs::read_to_string(path.value()).unwrap();
-    let scene = serde_yaml::from_str::<SGraph>(&source).unwrap();
+    let scene = serde_yaml::from_str::<SScene>(&source).unwrap();
 
     let mut tokens = TokenStream::new();
 

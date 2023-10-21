@@ -23,7 +23,7 @@ impl<T: Serialize + DeserializeOwned + 'static> SceneSerialization for T {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SGraph {
+pub struct SScene {
     pub entries: Vec<SEntityEntry>,
 }
 
@@ -40,29 +40,29 @@ pub struct SEntity {
     pub services: Vec<String>,
 }
 
-pub struct GraphDeserializer;
+pub struct SceneDeserializer;
 
-impl GraphDeserializer {
+impl SceneDeserializer {
     pub fn deserialize_from_source(source: &str, registry: &ComponentRegistry) -> Scene {
-        let mut world = Scene::new();
+        let mut scene = Scene::new();
 
-        let sgraph = serde_yaml::from_str::<SGraph>(source).unwrap();
+        let sscene = serde_yaml::from_str::<SScene>(source).unwrap();
 
-        for entry in &sgraph.entries {
+        for entry in &sscene.entries {
             let source = std::fs::read_to_string(entry.path.clone()).unwrap();
             let entity = EntityDeserializer::deserialize_from_source(source.as_str(), registry);
 
-            world.add_entity(&entry.name.clone(), entity);
+            scene.add_entity(&entry.name.clone(), entity);
         }
 
-        world
+        scene
     }
 }
 
-pub struct GraphSerializer;
+pub struct SceneSerializer;
 
-impl GraphSerializer {
-    pub fn serialize_from_world(world: &Scene) -> SGraph {
+impl SceneSerializer {
+    pub fn serialize_from_world(world: &Scene) -> SScene {
         let mut entities = Vec::new();
 
         for (name, entity) in &world.entities {
@@ -76,7 +76,7 @@ impl GraphSerializer {
             }
         }
 
-        SGraph { entries: entities }
+        SScene { entries: entities }
     }
 }
 
