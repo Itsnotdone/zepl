@@ -1,0 +1,20 @@
+[package]
+name = "zepl"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+app = { path = "crates/app" }
+scene = { path = "crates/scene" }
+macros = { path = "crates/macros" }
+ecs = { path = "crates/ecs" }
+
+[workspace]
+exclude = ["examples/hello/"]
+members = ["crates/*"]
+
+[[example]]
+name = "hello"
+path = "examples/hello/src/main.rs"

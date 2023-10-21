@@ -1,0 +1,20 @@
+[package]
+name = "scene"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ecs = { path = "../ecs" }
+
+hashbrown = "0.14.0"
+serde_yaml = "0.9.0"
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.glam]
+version = "0.24.2"
+features = ["serde"]

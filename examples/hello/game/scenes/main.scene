@@ -1,0 +1,4 @@
+entries:
+  -
+    path: "entities/player.entity"
+    name: "player"

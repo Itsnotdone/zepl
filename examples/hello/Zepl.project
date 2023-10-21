@@ -1,0 +1,8 @@
+game:
+    name: "MyGame"
+    version: "1.0"
+    author: "done"
+
+runtime:
+    main: "main"
+    dylib: "game/target/debug/libgame.so"
