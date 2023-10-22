@@ -15,6 +15,22 @@ impl Resources {
         self.resources.push(Box::new(resource));
     }
 
+    pub fn get_or_init<T: Default + 'static>(&mut self) -> &T {
+        if !self.has::<T>() {
+            self.add_resource(T::default());
+        }
+
+        self.get::<T>().unwrap()
+    }
+
+    pub fn get_mut_or_init<T: Default + 'static>(&mut self) -> &mut T {
+        if !self.has::<T>() {
+            self.add_resource(T::default());
+        }
+
+        self.get_mut::<T>().unwrap()
+    }
+
     pub fn get<T: 'static>(&self) -> Option<&T> {
         self.resources
             .iter()
@@ -25,5 +41,15 @@ impl Resources {
         self.resources
             .iter_mut()
             .find_map(|resource| resource.downcast_mut::<T>())
+    }
+
+    pub fn has<T: 'static>(&self) -> bool {
+        for resource in &self.resources {
+            if resource.is::<T>() {
+                return true;
+            }
+        }
+
+        false
     }
 }

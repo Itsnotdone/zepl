@@ -1,0 +1,8 @@
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/libglfw3.a
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/include/GLFW/glfw3.h
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/include/GLFW/glfw3native.h
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/cmake/glfw3/glfw3Config.cmake
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/cmake/glfw3/glfw3ConfigVersion.cmake
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/cmake/glfw3/glfw3Targets.cmake
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/cmake/glfw3/glfw3Targets-debug.cmake
+/home/marcin/Dokumenty/zeplanottherrs/examples/hello/game/target/debug/build/glfw-sys-bf7541cd93a7cb6d/out/lib/pkgconfig/glfw3.pc

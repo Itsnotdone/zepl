@@ -15,13 +15,10 @@ impl Schedule {
         self.systems.push(system);
     }
 
-    pub fn run(
-        &mut self,
-        entity: &mut Entity,
-        resources: &mut Resources,
-        commands: &mut Commands,
-    ) {
-        self.systems.iter().for_each(|system| system.run(entity, commands, resources));
+    pub fn run(&mut self, entity: &mut Entity, resources: &mut Resources, commands: &mut Commands) {
+        self.systems
+            .iter()
+            .for_each(|system| system.run(entity, commands, resources));
     }
 }
 

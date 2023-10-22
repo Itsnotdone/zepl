@@ -3,11 +3,13 @@ use std::{
     rc::Rc,
 };
 
-use ecs::{Command, Commands, Entity, EntityCommand, EntityCommands, Resources, Scene, ScheduleGraph};
+use ecs::{
+    Command, Commands, Entity, EntityCommand, EntityCommands, Resources, Scene, ScheduleGraph,
+};
 
 use scene::{ComponentRegistry, SceneLoader, Transform2d};
 
-use crate::{Config, Game};
+use crate::{Config, Game, InputEvent, Runner};
 pub struct App {
     scene: Rc<RefCell<Scene>>,
     schedule_graph: ScheduleGraph,
@@ -69,11 +71,20 @@ impl App {
         None
     }
 
+    pub fn get_resources(&mut self) -> &Resources {
+        &self.resources
+    }
+
+    pub fn get_mut_resources(&mut self) -> &mut Resources {
+        &mut self.resources
+    }
+
     pub fn execute_entity_commands(&mut self, name: String, commands: EntityCommands) {
         for command in commands.commands {
             match command {
                 EntityCommand::AddSystem(system_type, system) => {
-                    self.schedule_graph.add_system(name.clone(), system_type , system)
+                    self.schedule_graph
+                        .add_system(name.clone(), system_type, system)
                 }
             }
         }
@@ -91,6 +102,19 @@ impl App {
         self.resources.get::<SceneLoader>().unwrap()
     }
 
+    pub fn update(&mut self) {
+        let mut commands = Commands::new();
+        self.scene
+            .borrow_mut()
+            .entities
+            .iter_mut()
+            .for_each(|(name, entity)| {
+                self.schedule_graph
+                    .run(name.clone(), entity, &mut commands, &mut self.resources);
+            });
+        self.execute_commands(commands);
+    }
+
     pub fn run(mut self) {
         let mut commands = Commands::new();
         self.game.call_main(
@@ -99,19 +123,10 @@ impl App {
             &mut self.resources,
         );
         self.execute_commands(commands);
-        
-        loop{
-            let mut commands = Commands::new();
-            self.scene
-                .borrow_mut()
-                .entities
-                .iter_mut()
-                .for_each(|(name, entity)| {
-                    self.schedule_graph
-                        .run(name.clone(), entity, &mut commands, &mut self.resources);
-                });
-            self.execute_commands(commands);
-        }
-        
+        self.resources.add_resource(InputEvent::default());
+
+        let runner = Runner::new();
+
+        runner.run(self);
     }
 }

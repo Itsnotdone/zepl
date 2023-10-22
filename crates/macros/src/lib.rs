@@ -53,7 +53,6 @@ pub fn load_scene(tokens: TokenStream) -> TokenStream {
     tokens.extend::<TokenStream>(quote::quote!(Scene::new()).into());
 
     for entry in &scene.entries {
-        println!("{}", entry.path.clone());
         let source = std::fs::read_to_string(entry.path.clone()).unwrap();
         let name = entry.name.clone();
         tokens.extend::<TokenStream>(

@@ -87,7 +87,10 @@ impl EntitySerializer {
         let mut components = HashMap::new();
 
         for component in &entity.components {
-            components.insert(component.type_name(), registry.serialize(&**component));
+            components.insert(
+                registry.ids.get(&component.type_id()).unwrap().into(),
+                registry.serialize(&**component),
+            );
         }
 
         let sentity = SEntity {

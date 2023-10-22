@@ -7,11 +7,23 @@ pub fn player(commands: &mut EntityCommands){
 }
 
 pub fn setup_player(base: &mut Entity, commands: &mut Commands, resources: &mut Resources){
-    println!("setup player");
+    
 }
 
 pub fn update_player(base: &mut Entity, commands: &mut Commands, resources: &mut Resources){
-    println!("update player");
+    let input = resources.get::<InputEvent>().unwrap();
+
+    if input.is_pressed(Key::A){
+        println!("a pressed");
+    }
+
+    if input.is_just_pressed(Key::D){
+        println!("d just pressed");
+    }
+
+    if input.is_just_released(Key::W){
+        println!("w just released");
+    }
 }
 
 

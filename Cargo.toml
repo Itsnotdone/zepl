@@ -10,10 +10,11 @@ app = { path = "crates/app" }
 scene = { path = "crates/scene" }
 macros = { path = "crates/macros" }
 ecs = { path = "crates/ecs" }
+renderer = { path = "crates/renderer" }
 
 [workspace]
 exclude = ["examples/hello/"]
-members = ["crates/*"]
+members = ["crates/*", "crates/renderer/server"]
 
 [[example]]
 name = "hello"

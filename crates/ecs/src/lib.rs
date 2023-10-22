@@ -1,5 +1,3 @@
-#![feature(type_name_of_val)]
-
 mod component;
 mod entity;
 mod resources;
