@@ -7,3 +7,15 @@ edition = "2021"
 
 [dependencies]
 server = { path = "server"}
+ecs = { path = "../ecs" }
+scene = { path = "../scene" }
+
+encase = "0.6"
+bytemuck = "1.0"
+image = "0.24"
+wgpu = "0.18"
+pollster = "0.3.0"
+
+[dependencies.glfw]
+version = "0.53"
+features = ["vulkan"]

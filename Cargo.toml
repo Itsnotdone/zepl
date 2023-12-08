@@ -14,7 +14,7 @@ renderer = { path = "crates/renderer" }
 
 [workspace]
 exclude = ["examples/hello/"]
-members = ["crates/*", "crates/renderer/server"]
+members = ["crates/*", "crates/renderer/server", "crates/ecs/system"]
 
 [[example]]
 name = "hello"

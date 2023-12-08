@@ -1,16 +1,16 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_yaml::Value;
-use std::collections::HashMap;
+use std::{borrow::BorrowMut, collections::HashMap};
 
-use ecs::{Component, Entity, Scene};
+use ecs::{Component, Entity, World};
 
 use crate::ComponentRegistry;
-pub trait SceneSerialization {
+pub trait WorldSerialization {
     fn serialize(any: &dyn Component) -> Value;
     fn deserialize(value: &Value) -> Box<dyn Component>;
 }
 
-impl<T: Serialize + DeserializeOwned + 'static> SceneSerialization for T {
+impl<T: Serialize + DeserializeOwned + 'static> WorldSerialization for T {
     fn serialize(component: &dyn Component) -> Value {
         serde_yaml::to_value(component.as_any().downcast_ref::<T>().unwrap()).unwrap()
     }
@@ -23,7 +23,7 @@ impl<T: Serialize + DeserializeOwned + 'static> SceneSerialization for T {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SScene {
+pub struct SWorld {
     pub entries: Vec<SEntityEntry>,
 }
 
@@ -37,46 +37,46 @@ pub struct SEntityEntry {
 pub struct SEntity {
     #[serde(flatten)]
     pub components: HashMap<String, Value>,
-    pub services: Vec<String>,
 }
 
-pub struct SceneDeserializer;
+pub struct WorldDeserializer;
 
-impl SceneDeserializer {
-    pub fn deserialize_from_source(source: &str, registry: &ComponentRegistry) -> Scene {
-        let mut scene = Scene::new();
+impl WorldDeserializer {
+    pub fn deserialize_from_source(source: &str, registry: &ComponentRegistry) -> World {
+        let mut scene = World::new();
 
-        let sscene = serde_yaml::from_str::<SScene>(source).unwrap();
+        let sscene = serde_yaml::from_str::<SWorld>(source).unwrap();
 
         for entry in &sscene.entries {
             let source = std::fs::read_to_string(entry.path.clone()).unwrap();
-            let entity = EntityDeserializer::deserialize_from_source(source.as_str(), registry);
-
-            scene.add_entity(&entry.name.clone(), entity);
+            let mut entity = EntityDeserializer::deserialize_from_source(
+                entry.name.clone(),
+                source.as_str(),
+                registry,
+            );
+            scene.add_entity(entity);
         }
 
         scene
     }
 }
 
-pub struct SceneSerializer;
+pub struct WorldSerializer;
 
-impl SceneSerializer {
-    pub fn serialize_from_world(world: &Scene) -> SScene {
+impl WorldSerializer {
+    pub fn serialize_from_world(world: &World) -> SWorld {
         let mut entities = Vec::new();
 
-        for (name, entity) in &world.entities {
-            if let Some(path) = &entity.path {
-                let sentity_entry = SEntityEntry {
-                    path: path.clone(),
-                    name: name.clone(),
-                };
+        for entity in world.iter() {
+            let sentity_entry = SEntityEntry {
+                path: entity.path.clone(),
+                name: entity.name.clone(),
+            };
 
-                entities.push(sentity_entry);
-            }
+            entities.push(sentity_entry);
         }
 
-        SScene { entries: entities }
+        SWorld { entries: entities }
     }
 }
 
@@ -86,17 +86,14 @@ impl EntitySerializer {
     pub fn serialize_from_entity(entity: &Entity, registry: &ComponentRegistry) -> SEntity {
         let mut components = HashMap::new();
 
-        for component in &entity.components {
+        for component in entity.iterate_components() {
             components.insert(
                 registry.ids.get(&component.type_id()).unwrap().into(),
                 registry.serialize(&**component),
             );
         }
 
-        let sentity = SEntity {
-            components,
-            services: entity.services.clone(),
-        };
+        let sentity = SEntity { components };
 
         sentity
     }
@@ -105,15 +102,18 @@ impl EntitySerializer {
 pub struct EntityDeserializer;
 
 impl EntityDeserializer {
-    pub fn deserialize_from_source(source: &str, registry: &ComponentRegistry) -> Entity {
+    pub fn deserialize_from_source(
+        entity_name: String,
+        source: &str,
+        registry: &ComponentRegistry,
+    ) -> Entity {
         let sentity = serde_yaml::from_str::<SEntity>(source).unwrap();
         let mut entity = Entity::new();
+        entity.name = entity_name;
 
         for (id, value) in &sentity.components {
             entity.add_boxed(registry.deserialize(id.into(), value));
         }
-
-        entity.services = sentity.services;
 
         entity
     }

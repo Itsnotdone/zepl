@@ -3,7 +3,7 @@ use std::{any::TypeId, collections::HashMap};
 
 use ecs::Component;
 
-use crate::SceneSerialization;
+use crate::WorldSerialization;
 
 pub struct ComponentRegistry {
     pub ids: HashMap<TypeId, String>,
@@ -23,7 +23,7 @@ impl ComponentRegistry {
         }
     }
 
-    pub fn register<T: SceneSerialization + 'static>(&mut self, id: &str) {
+    pub fn register<T: WorldSerialization + 'static>(&mut self, id: &str) {
         self.ids.insert(TypeId::of::<T>(), id.to_string());
         self.components.insert(
             id.to_string(),

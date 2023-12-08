@@ -1,5 +1,7 @@
 use std::any::Any;
 
+use crate::Handle;
+
 pub struct Resources {
     resources: Vec<Box<dyn Any>>,
 }
@@ -11,8 +13,24 @@ impl Resources {
         }
     }
 
-    pub fn add_resource(&mut self, resource: impl Any + 'static) {
+    pub fn add_resource<T: Any + 'static>(&mut self, resource: T) -> Handle<T> {
         self.resources.push(Box::new(resource));
+
+        Handle::<T>::new(self.resources.len() - 1)
+    }
+
+    pub fn handle<T: 'static>(&self, handle: &Handle<T>) -> Option<&T> {
+        if let Some(any) = self.resources.get(handle.index) {
+            return any.downcast_ref::<T>();
+        }
+        None
+    }
+
+    pub fn handle_mut<T: 'static>(&mut self, handle: &Handle<T>) -> Option<&mut T> {
+        if let Some(any) = self.resources.get_mut(handle.index) {
+            return any.downcast_mut::<T>();
+        }
+        None
     }
 
     pub fn get_or_init<T: Default + 'static>(&mut self) -> &T {

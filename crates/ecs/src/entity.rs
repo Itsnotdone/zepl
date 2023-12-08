@@ -1,26 +1,24 @@
-use std::{any::Any, cell::RefCell, rc::Rc};
+use std::{
+    any::Any,
+    slice::{Iter, IterMut},
+};
 
-use crate::{Component, Scene};
+use crate::Component;
 
 pub struct Entity {
-    pub scene: Option<Rc<RefCell<Scene>>>,
-    pub components: Vec<Box<dyn Component>>,
-    pub services: Vec<String>,
-    pub path: Option<String>,
+    components: Vec<Box<dyn Component>>,
+
+    pub name: String,
+    pub path: String,
 }
 
 impl Entity {
     pub fn new() -> Self {
         Self {
-            scene: None,
             components: Vec::new(),
-            services: Vec::new(),
-            path: None,
+            name: String::new(),
+            path: String::new(),
         }
-    }
-
-    pub fn link_scene(&mut self, scene: Rc<RefCell<Scene>>) {
-        self.scene = Some(scene);
     }
 
     pub fn with(&mut self, component: impl Component + 'static) -> &mut Entity {
@@ -33,21 +31,17 @@ impl Entity {
         self
     }
 
-    pub fn with_service(&mut self, service: &str) -> &mut Entity {
-        self.services.push(service.to_string());
-        self
-    }
-
-    pub fn add(&mut self, component: impl Component + 'static) {
+    pub fn add_component(&mut self, component: impl Component + 'static) {
         self.components.push(Box::new(component));
     }
 
     pub fn add_boxed(&mut self, component: Box<dyn Component>) {
         self.components.push(component);
     }
+
     pub fn has<T: 'static>(&self) -> bool {
         for component in &self.components {
-            if (component as &dyn Any).is::<T>() {
+            if component.as_ref().as_any().is::<T>() {
                 return true;
             }
         }
@@ -78,7 +72,19 @@ impl Entity {
         }
     }
 
+    pub fn iterate_components(&self) -> Iter<Box<dyn Component>> {
+        self.components.iter()
+    }
+
+    pub fn iterate_components_mut(&mut self) -> IterMut<Box<dyn Component>> {
+        self.components.iter_mut()
+    }
+
     pub fn set_path(&mut self, path: String) {
-        self.path = Some(path);
+        self.path = path;
+    }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
     }
 }

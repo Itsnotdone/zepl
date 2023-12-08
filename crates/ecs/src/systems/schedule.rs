@@ -1,28 +1,35 @@
-use crate::{Commands, Entity, Resources, System};
+use crate::{Resources, World};
 
 pub struct Schedule {
-    systems: Vec<Box<dyn System>>,
+    runners: Vec<Box<dyn Runner>>,
 }
-
 impl Schedule {
     pub fn new() -> Self {
         Self {
-            systems: Vec::new(),
+            runners: Vec::new(),
         }
     }
 
-    pub fn add_system(&mut self, system: Box<dyn System>) {
-        self.systems.push(system);
+    pub fn add_system(&mut self, system: impl Runner + 'static) {
+        self.runners.push(Box::new(system))
     }
 
-    pub fn run(&mut self, entity: &mut Entity, resources: &mut Resources, commands: &mut Commands) {
-        self.systems
+    pub fn run(&mut self, world: &mut World, resources: &mut Resources) {
+        self.runners
             .iter()
-            .for_each(|system| system.run(entity, commands, resources));
+            .for_each(|runner| runner.run((world, resources)))
     }
 }
 
-pub enum SystemType {
-    Update,
-    Setup,
+pub trait Runner {
+    fn run(&self, (_world, _resources): (&mut World, &mut Resources)) {}
+}
+
+impl<F> Runner for F
+where
+    F: Fn((&mut World, &mut Resources)),
+{
+    fn run(&self, (world, resources): (&mut World, &mut Resources)) {
+        self((world, resources))
+    }
 }

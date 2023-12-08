@@ -1,4 +1,4 @@
-use ecs::{Commands, EntityCommands, Resources};
+use ecs::{Commands, Resources, ScheduleGraph};
 use libloading::*;
 
 pub struct Game {
@@ -14,15 +14,25 @@ impl Game {
         }
     }
 
-    pub fn call_service(&self, service: &str, commands: &mut EntityCommands) {
+    pub fn call_system_builder(&self, name: &str, graph: &mut ScheduleGraph) {
         unsafe {
             let func = self
                 .library
-                .get::<unsafe extern "C" fn(&mut EntityCommands)>(service.as_bytes())
+                .get::<unsafe extern "C" fn(&mut ScheduleGraph)>(name.as_bytes())
                 .unwrap();
-            func(commands)
+
+            func(graph)
         }
     }
+    // pub fn call_service(&self, service: &str, commands: &mut EntityCommands) {
+    //     unsafe {
+    //         let func = self
+    //             .library
+    //             .get::<unsafe extern "C" fn(&mut EntityCommands)>(service.as_bytes())
+    //             .unwrap();
+    //         func(commands)
+    //     }
+    // }
 
     pub fn call_main(&self, main: &str, commands: &mut Commands, resources: &mut Resources) {
         unsafe {
